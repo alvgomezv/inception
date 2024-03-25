@@ -3,15 +3,65 @@ version: '3'
 services:
   nginx:
     build:
-      context: .
-      dockerfile: requirements/nginx/Dockerfile
+      context: ./requirements/nginx
+      dockerfile: Dockerfile
     container_name: nginx
-#    depends_on:
-#      - wordpress
+    env_file:
+      - .env
+    depends_on:
+      - wordpress
     ports:
       - "443:443"
+    networks:
+      - inception
     volumes:
       - ./requirements/nginx/conf/:/etc/nginx/http.d/
       - ./requirements/nginx/tools:/etc/nginx/ssl/
-      - /home/${USER}/Inception/simple_docker_nginx_html/public/html:/var/www/
+      - wp-volume:/var/www
     restart: always
+
+  mariadb:
+    build:
+      context: ./requirements/mariadb
+      dockerfile: Dockerfile
+    container_name: mariadb
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"
+    networks:
+      - inception
+    volumes:
+      - db-volume:/var/lib/mysql
+    restart: always
+
+  wordpress:
+    build:
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
+    container_name: wordpress
+    depends_on:
+      - mariadb
+    env_file:
+      - .env
+    networks:
+      - inception
+    volumes:
+      - wp-volume:/var/www/
+    restart: always
+
+volumes:
+  db-volume:
+    driver_opts:
+      type: none
+      o: bind
+      device: "/home/${USER}/Inception/db-volume"
+  wp-volume:
+    driver_opts:
+      type: none
+      o: bind
+      device: "/home/${USER}/Inception/wp-volume"
+
+networks:
+    inception:
+        driver: bridge
