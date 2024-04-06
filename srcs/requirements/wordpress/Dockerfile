@@ -39,5 +39,3 @@ RUN  chmod -R 0777 wp-content
 EXPOSE 9000
 
 CMD [ "sh","wp-config-create.sh" ]
-#CMD ["/usr/sbin/php-fpm81", "-F"]
-#CMD ["sh", "-c", "while true; do : > /dev/null; sleep 1; done"]

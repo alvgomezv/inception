@@ -49,18 +49,69 @@ services:
     volumes:
       - wp-volume:/var/www/
     restart: always
+  
+  redis:
+    build:
+      context: requirements/bonus/redis
+      dockerfile: Dockerfile
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - inception
+    restart: always
+
+  vsftpd:
+    build:
+      context: requirements/bonus/vsftpd
+      dockerfile: Dockerfile
+      args:
+        FTP_USR: ${FTP_USR}
+        FTP_PWD: ${FTP_PWD}
+    container_name: vsftpd
+    env_file:
+      - .env
+    ports:
+      - "21:21"
+    volumes:
+      - wp-volume:/var/www/
+    networks:
+     - inception
+    restart: always
+
+  adminer:
+    build:
+      context: requirements/bonus/adminer
+      dockerfile: Dockerfile
+    container_name: adminer
+    depends_on:
+      - mariadb
+    ports:
+      - "8080:8080"
+    networks:
+     - inception
+    restart: always
+
+  website:
+    build:
+      context: requirements/bonus/website
+      dockerfile: Dockerfile
+    container_name: website
+    ports:
+      - "80:80"
+    restart: always
 
 volumes:
   db-volume:
     driver_opts:
       type: none
       o: bind
-      device: "/home/${USER}/Inception/db-volume"
+      device: "/home/${USER}/data/mariadb"
   wp-volume:
     driver_opts:
       type: none
       o: bind
-      device: "/home/${USER}/Inception/wp-volume"
+      device: "/home/${USER}/data/wordpress"
 
 networks:
     inception:
