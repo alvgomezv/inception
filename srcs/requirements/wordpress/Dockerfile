@@ -1,4 +1,4 @@
-FROM alpine:3.19
+FROM alpine:3.18
 
 ARG PHP_VERSION=81 \
 	DB_NAME \
@@ -24,6 +24,7 @@ RUN apk update && apk upgrade && apk add --no-cache \
     php${PHP_VERSION}-zip \
 	php${PHP_VERSION}-phar \
 	php${PHP_VERSION}-iconv \
+	mariadb-client \
 	wget \
     curl \
     unzip

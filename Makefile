@@ -20,6 +20,8 @@ re:	down
 	@cd srcs && docker-compose build
 	@cd srcs && docker-compose up -d
 	
+bonus:
+	
 
 clean: down
 	@printf "Cleaning containers: ${name} ... \n"
