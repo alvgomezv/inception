@@ -3,7 +3,11 @@ FROM alpine:3.19
 ARG PHP_VERSION=81 \
 	DB_NAME \
 	DB_USER \
-	DB_PASS
+	DB_PASS \
+	WP_USER \
+	WP_PASS \
+	WP_EMAIL \
+	DOMAIN_NAME
 
 RUN apk update && apk upgrade && apk add --no-cache \
     php${PHP_VERSION} \
@@ -18,7 +22,10 @@ RUN apk update && apk upgrade && apk add --no-cache \
     php${PHP_VERSION}-openssl \
     php${PHP_VERSION}-xml \
     php${PHP_VERSION}-zip \
-    wget \
+	php${PHP_VERSION}-phar \
+	php${PHP_VERSION}-iconv \
+	wget \
+    curl \
     unzip
 
 COPY conf/php-fpm.conf etc/php${PHP_VERSION}/php-fpm.conf
@@ -34,8 +41,8 @@ RUN wget https://wordpress.org/latest.zip && \
 
 COPY tools/wp-config-create.sh .
 
-RUN  chmod -R 0777 wp-content 
+RUN  chmod -R 0777 wp-content && chmod +x wp-config-create.sh
 
 EXPOSE 9000
 
-CMD [ "sh","wp-config-create.sh" ]
+CMD [ "./wp-config-create.sh" ]
